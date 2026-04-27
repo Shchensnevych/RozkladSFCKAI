@@ -1,0 +1,29 @@
+{% block content %}
+  
+  <div style="border-radius: 20px;  box-shadow: 0 0 5px 5px #e7d5c0; padding: 20px">
+  <form >
+      <legend>Виберіть групу:</legend>
+      <fieldset>
+     
+      <select id="groups">
+          <option value="0">---------------------</option>
+          {% if grp %}
+              {% for g in grp %}
+               <option value="{{g.gid}}">{{g.gname }}</option>
+
+              {% endfor %}
+          {% endif %}
+         
+      </select>
+
+      <button type="button" onclick="javasript:askGroup();">Отримати розклад</button>
+
+      </fieldset>
+  </form>
+  </div>
+  <center>
+    <p>В нас також є бот телеграм</p>
+    <a href="https://t.me/ScheduleSFKNAU_Bot"><img src="/static/pics/telegram.png" alt="telegram"/></a>
+  </center>
+
+{% endblock %}

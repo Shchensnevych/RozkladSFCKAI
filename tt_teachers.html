@@ -1,0 +1,25 @@
+<div style="border-radius: 20px;  box-shadow: 0 0 5px 5px #e7d5c0; padding: 20px">
+  <form >
+      <legend>Виберіть викладача:</legend>
+      <fieldset>
+     
+      <select id="teachers">
+          <option value="0">---------------------</option>
+          {% if teach %}
+              {% for t in teach %}
+               <option value="{{t.tid}}">{{t.fam}}</option>
+              {% endfor %}
+          {% endif %}
+         
+      </select>
+
+      <button type="button" onclick="javascript:askTeacher();">Отримати розклад</button>
+
+      </fieldset>
+  </form>
+</div>
+
+  <center>
+    <p>В нас також є бот телеграм</p>
+    <a href="https://t.me/ScheduleSFKNAU_Bot"><img src="/static/pics/telegram.png" alt="telegram"/></a>
+  </center>
