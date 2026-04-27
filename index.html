@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Тимчасовий розклад занять СФК ДУ КАІ — перегляд за викладачами та групами">
+  <meta name="theme-color" content="#0f1117">
+  <title>Розклад занять — СФК ДУ КАІ</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="header__badge"><i class="fa-solid fa-triangle-exclamation"></i> Тимчасова сторінка</div>
+    <h1 class="header__title">Розклад занять</h1>
+    <p class="header__subtitle">Слов'янський фаховий коледж державного некомерційного підприємства «Державний університет «Київський авіаційний інститут»</p>
+    <p class="header__date-range" id="dateRange"></p>
+  </header>
+
+  <main class="container">
+
+    <!-- Tabs -->
+    <nav class="tabs" role="tablist">
+      <button class="tab-btn active" data-tab="tabGroups" role="tab" aria-selected="true" id="btnGroups">
+        <span class="tab-icon"><i class="fa-solid fa-users"></i></span> За групою
+      </button>
+      <button class="tab-btn" data-tab="tabTeachers" role="tab" aria-selected="false" id="btnTeachers">
+        <span class="tab-icon"><i class="fa-solid fa-chalkboard-user"></i></span> За викладачем
+      </button>
+      <button class="tab-btn" data-tab="tabDocs" role="tab" aria-selected="false" id="btnDocs">
+        <span class="tab-icon"><i class="fa-solid fa-file-pdf"></i></span> Документи
+      </button>
+    </nav>
+
+    <!-- Tab: Groups -->
+    <section class="tab-content active" id="tabGroups">
+      <div class="selector-card">
+        <div class="selector-card__label">Виберіть групу</div>
+        <div class="select-wrapper">
+          <select id="groupSelect">
+            <option value="">— оберіть групу —</option>
+          </select>
+        </div>
+      </div>
+      <h2 id="groupTitle" style="text-align:center;margin-bottom:1rem;font-size:1.1rem;color:var(--accent-blue-light)"></h2>
+      <div class="schedule-output" id="groupOutput"></div>
+    </section>
+
+    <!-- Tab: Teachers -->
+    <section class="tab-content" id="tabTeachers">
+      <div class="selector-card">
+        <div class="selector-card__label">Виберіть викладача</div>
+        <div class="select-wrapper">
+          <select id="teacherSelect">
+            <option value="">— оберіть викладача —</option>
+          </select>
+        </div>
+      </div>
+      <h2 id="teacherTitle" style="text-align:center;margin-bottom:1rem;font-size:1.1rem;color:var(--accent-yellow)"></h2>
+      <div class="schedule-output" id="teacherOutput"></div>
+    </section>
+
+    <!-- Tab: Documents -->
+    <section class="tab-content" id="tabDocs">
+      <div class="docs-section">
+        <div class="docs-grid">
+          <a href="pdf/ispyty_1.pdf" target="_blank" class="doc-card">
+            <span class="doc-card__icon"><i class="fa-solid fa-file-lines"></i></span>
+            <div class="doc-card__info">
+              <div class="doc-card__title">Розклад семестрових іспитів</div>
+              <div class="doc-card__desc">PDF документ</div>
+            </div>
+            <span class="doc-card__arrow">→</span>
+          </a>
+          <a href="pdf/ispyty_2.pdf" target="_blank" class="doc-card">
+            <span class="doc-card__icon"><i class="fa-solid fa-file-lines"></i></span>
+            <div class="doc-card__info">
+              <div class="doc-card__title">Розклад іспитів літньої сесії 2025-2026</div>
+              <div class="doc-card__desc">PDF документ</div>
+            </div>
+            <span class="doc-card__arrow">→</span>
+          </a>
+          <a href="pdf/kursovi_aat.pdf" target="_blank" class="doc-card">
+            <span class="doc-card__icon"><i class="fa-solid fa-clipboard-list"></i></span>
+            <div class="doc-card__info">
+              <div class="doc-card__title">Графік захисту курсових — ЦК ААТ</div>
+              <div class="doc-card__desc">PDF документ</div>
+            </div>
+            <span class="doc-card__arrow">→</span>
+          </a>
+          <a href="pdf/kursovi_estzp.pdf" target="_blank" class="doc-card">
+            <span class="doc-card__icon"><i class="fa-solid fa-clipboard-list"></i></span>
+            <div class="doc-card__info">
+              <div class="doc-card__title">Графік захисту курсових — ЦК ЕСТЗП</div>
+              <div class="doc-card__desc">PDF документ</div>
+            </div>
+            <span class="doc-card__arrow">→</span>
+          </a>
+        </div>
+      </div>
+
+
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p><i class="fa-solid fa-clock-rotate-left"></i> Тимчасова сторінка розкладу СФК ДУ КАІ © 2026</p>
+    <p style="margin-top:0.3rem">Основний сайт тимчасово недоступний</p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
