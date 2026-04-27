@@ -482,12 +482,13 @@ window.openJournalModal = function(type, targetId, subject) {
   filtered.forEach(r => {
     const key = `${r.dt}-${r.pair}`;
     if (!uniquePairs.has(key)) {
-      uniquePairs.set(key, { ...r }); // copy
+      uniquePairs.set(key, { ...r, allGroups: [r.gname] }); 
     } else {
       if (type === 'teacher') {
         const existing = uniquePairs.get(key);
-        if (!existing.gname.includes(r.gname)) {
-          existing.gname += `, ${r.gname}`;
+        if (!existing.allGroups.includes(r.gname)) {
+          existing.allGroups.push(r.gname);
+          existing.gname = existing.allGroups.join(', ');
         }
       }
     }
@@ -500,27 +501,66 @@ window.openJournalModal = function(type, targetId, subject) {
     return a.pair - b.pair;
   });
 
-  let html = '';
-  let currentMonth = '';
-  
-  sorted.forEach(r => {
-    const dateObj = new Date(r.dt.split(' ')[0]);
-    const monthKey = dateObj.toLocaleString('uk-UA', { month: 'long', year: 'numeric' });
-    if (monthKey !== currentMonth) {
-      html += `<div style="padding: 0.5rem 0.8rem; background: rgba(255,255,255,0.02); font-weight: bold; color: var(--accent-yellow); margin-top: 1rem; border-radius: 4px; text-transform: capitalize;">${monthKey}</div>`;
-      currentMonth = monthKey;
+  let filterHtml = '';
+  if (type === 'teacher') {
+    const groupsList = Array.from(new Set(filtered.map(r => r.gname))).sort();
+    if (groupsList.length > 1) {
+      const totalHours = sorted.length * 2;
+      filterHtml += `<div class="journal-filters" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1rem;">`;
+      filterHtml += `<button class="journal-filter-btn active" data-group="all">Всі групи (${totalHours} год)</button>`;
+      
+      groupsList.forEach(g => {
+        const gHours = sorted.filter(p => p.allGroups.includes(g)).length * 2;
+        filterHtml += `<button class="journal-filter-btn" data-group="${g}">${g} (${gHours} год)</button>`;
+      });
+      filterHtml += `</div>`;
     }
+  }
+
+  function renderList(groupFilter) {
+    let html = '';
+    let currentMonth = '';
     
-    html += `
-      <div class="journal-item">
-        <div class="journal-date"><i class="fa-regular fa-calendar-check" style="color: var(--accent-blue-light);"></i>${formatDate(r.dt)}</div>
-        <div class="journal-pair"><span class="pair-number" style="display:inline-flex; width: 22px; height: 22px; align-items:center; justify-content:center;">${r.pair}</span> пара ${type === 'teacher' ? `<br><span style="font-size:0.8rem;opacity:0.7">${r.gname}</span>` : ''}</div>
-      </div>
-    `;
-  });
+    let listToRender = sorted;
+    if (groupFilter !== 'all') {
+      listToRender = sorted.filter(p => p.allGroups && p.allGroups.includes(groupFilter));
+    }
+
+    listToRender.forEach(r => {
+      const dateObj = new Date(r.dt.split(' ')[0]);
+      const monthKey = dateObj.toLocaleString('uk-UA', { month: 'long', year: 'numeric' });
+      if (monthKey !== currentMonth) {
+        html += `<div style="padding: 0.5rem 0.8rem; background: rgba(255,255,255,0.02); font-weight: bold; color: var(--accent-yellow); margin-top: 1rem; border-radius: 4px; text-transform: capitalize;">${monthKey}</div>`;
+        currentMonth = monthKey;
+      }
+      
+      html += `
+        <div class="journal-item">
+          <div class="journal-date"><i class="fa-regular fa-calendar-check" style="color: var(--accent-blue-light);"></i>${formatDate(r.dt)}</div>
+          <div class="journal-pair"><span class="pair-number" style="display:inline-flex; width: 22px; height: 22px; align-items:center; justify-content:center;">${r.pair}</span> пара ${type === 'teacher' ? `<br><span style="font-size:0.8rem;opacity:0.7">${r.gname}</span>` : ''}</div>
+        </div>
+      `;
+    });
+    return html;
+  }
 
   document.getElementById('journalModalTitle').textContent = subject;
-  document.getElementById('journalModalBody').innerHTML = html;
+  
+  const bodyEl = document.getElementById('journalModalBody');
+  bodyEl.innerHTML = filterHtml + `<div id="journalListContainer">${renderList('all')}</div>`;
+  
+  if (filterHtml) {
+    const btns = bodyEl.querySelectorAll('.journal-filter-btn');
+    btns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        btns.forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        const g = e.target.getAttribute('data-group');
+        document.getElementById('journalListContainer').innerHTML = renderList(g);
+      });
+    });
+  }
+
   document.getElementById('journalModal').classList.add('active');
 };
 
