@@ -165,7 +165,7 @@ function renderTeacherTable(schedule) {
     html += `<div class="day-card">
       <div class="day-card__header"><span class="day-icon"><i class="fa-regular fa-calendar-days"></i></span> ${formatDate(dt)}</div>
       <table class="schedule-table">
-        <thead><tr><th style="width:50px">Пара</th><th>Групи</th><th>Дисципліна</th></tr></thead>
+        <thead><tr><th class="col-pair">Пара</th><th class="col-middle">Групи</th><th class="col-last">Дисципліна</th></tr></thead>
         <tbody>`;
     pairs.forEach(p => {
       html += `<tr>
@@ -186,7 +186,7 @@ function renderGroupTable(schedule) {
     html += `<div class="day-card">
       <div class="day-card__header"><span class="day-icon">📅</span> ${formatDate(dt)}</div>
       <table class="schedule-table">
-        <thead><tr><th style="width:50px">Пара</th><th>Викладач</th><th>Дисципліна</th></tr></thead>
+        <thead><tr><th class="col-pair">Пара</th><th class="col-middle">Викладач</th><th class="col-last">Дисципліна</th></tr></thead>
         <tbody>`;
     pairs.forEach(p => {
       html += `<tr>
@@ -223,55 +223,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const rangeEl = document.getElementById('dateRange');
   if (rangeEl) rangeEl.textContent = getDateRange(SCHEDULE_DATA);
 
-  // Populate teacher select
-  const teacherSelect = document.getElementById('teacherSelect');
-  teachers.forEach(t => {
-    const opt = document.createElement('option');
-    opt.value = t.tid;
-    opt.textContent = t.fam;
-    teacherSelect.appendChild(opt);
-  });
-
-  // Populate group select
-  const groupSelect = document.getElementById('groupSelect');
-  groups.forEach(g => {
-    const opt = document.createElement('option');
-    opt.value = g.gid;
-    opt.textContent = g.gname;
-    groupSelect.appendChild(opt);
-  });
-
-  // Teacher select handler
+  // DOM Elements
   const teacherOutput = document.getElementById('teacherOutput');
   const teacherTitle = document.getElementById('teacherTitle');
-  teacherSelect.addEventListener('change', () => {
-    if (!teacherSelect.value) {
-      teacherOutput.innerHTML = renderEmpty();
-      teacherTitle.textContent = '';
-      return;
-    }
-    const tid = parseInt(teacherSelect.value);
-    const fam = teacherSelect.options[teacherSelect.selectedIndex].textContent;
-    teacherTitle.textContent = fam;
-    const schedule = buildTeacherSchedule(SCHEDULE_DATA, [tid]);
+  const groupOutput = document.getElementById('groupOutput');
+  const groupTitle = document.getElementById('groupTitle');
+
+  // ─── Setup Custom Selects ───
+  setupCustomSelect('groupCustomSelect', 'groupSelectHeader', 'groupSelectDropdown', 'groupSelectValue', 'groupSearchInput', 'groupList', groups, (item) => {
+    groupTitle.textContent = item.label;
+    const schedule = buildGroupSchedule(SCHEDULE_DATA, parseInt(item.value));
+    groupOutput.innerHTML = renderGroupTable(schedule);
+  });
+
+  setupCustomSelect('teacherCustomSelect', 'teacherSelectHeader', 'teacherSelectDropdown', 'teacherSelectValue', 'teacherSearchInput', 'teacherList', teachers, (item) => {
+    teacherTitle.textContent = item.label;
+    const schedule = buildTeacherSchedule(SCHEDULE_DATA, [parseInt(item.value)]);
     teacherOutput.innerHTML = renderTeacherTable(schedule);
   });
 
-  // Group select handler
-  const groupOutput = document.getElementById('groupOutput');
-  const groupTitle = document.getElementById('groupTitle');
-  groupSelect.addEventListener('change', () => {
-    if (!groupSelect.value) {
-      groupOutput.innerHTML = renderEmpty();
-      groupTitle.textContent = '';
-      return;
-    }
-    const gid = parseInt(groupSelect.value);
-    const gname = groupSelect.options[groupSelect.selectedIndex].textContent;
-    groupTitle.textContent = gname;
-    const schedule = buildGroupSchedule(SCHEDULE_DATA, gid);
-    groupOutput.innerHTML = renderGroupTable(schedule);
-  });
 
   // Tab switching
   const tabBtns = document.querySelectorAll('.tab-btn');
@@ -290,4 +260,74 @@ document.addEventListener('DOMContentLoaded', () => {
   // Init empty states
   teacherOutput.innerHTML = renderEmpty();
   groupOutput.innerHTML = renderEmpty();
+});
+
+// ─── Custom Select Logic ───
+function setupCustomSelect(containerId, headerId, dropdownId, valueId, searchId, listId, dataItems, onSelect) {
+  const container = document.getElementById(containerId);
+  const header = document.getElementById(headerId);
+  const valueEl = document.getElementById(valueId);
+  const searchInput = document.getElementById(searchId);
+  const listEl = document.getElementById(listId);
+
+  // Map data to standard format { value, label }
+  const items = dataItems.map(d => ({
+    value: d.gid || d.tid,
+    label: d.gname || d.fam
+  }));
+
+  function renderList(filterText = '') {
+    listEl.innerHTML = '';
+    const filtered = items.filter(i => i.label.toLowerCase().includes(filterText.toLowerCase()));
+    
+    if (filtered.length === 0) {
+      listEl.innerHTML = '<li class="no-results">Нічого не знайдено</li>';
+      return;
+    }
+
+    filtered.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = item.label;
+      li.dataset.value = item.value;
+      li.addEventListener('click', (e) => {
+        e.stopPropagation();
+        valueEl.textContent = item.label;
+        container.classList.remove('open');
+        onSelect(item);
+      });
+      listEl.appendChild(li);
+    });
+  }
+
+  // Initial render
+  renderList();
+
+  // Toggle dropdown
+  header.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = container.classList.contains('open');
+    // Close all other selects
+    document.querySelectorAll('.custom-select').forEach(el => el.classList.remove('open'));
+    if (!isOpen) {
+      container.classList.add('open');
+      searchInput.value = '';
+      renderList();
+      searchInput.focus();
+    }
+  });
+
+  // Search filtering
+  searchInput.addEventListener('input', (e) => {
+    renderList(e.target.value);
+  });
+
+  // Prevent closing when clicking inside dropdown
+  document.getElementById(dropdownId).addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', () => {
+  document.querySelectorAll('.custom-select').forEach(el => el.classList.remove('open'));
 });

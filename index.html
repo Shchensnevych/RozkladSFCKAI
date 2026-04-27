@@ -37,10 +37,18 @@
     <section class="tab-content active" id="tabGroups">
       <div class="selector-card">
         <div class="selector-card__label">Виберіть групу</div>
-        <div class="select-wrapper">
-          <select id="groupSelect">
-            <option value="">— оберіть групу —</option>
-          </select>
+        <div class="custom-select" id="groupCustomSelect">
+          <div class="custom-select__header" id="groupSelectHeader">
+            <span class="custom-select__value" id="groupSelectValue">— оберіть групу —</span>
+            <i class="fa-solid fa-chevron-down custom-select__icon"></i>
+          </div>
+          <div class="custom-select__dropdown" id="groupSelectDropdown">
+            <div class="custom-select__search">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="groupSearchInput" placeholder="Пошук групи..." autocomplete="off">
+            </div>
+            <ul class="custom-select__list" id="groupList"></ul>
+          </div>
         </div>
       </div>
       <h2 id="groupTitle" style="text-align:center;margin-bottom:1rem;font-size:1.1rem;color:var(--accent-blue-light)"></h2>
@@ -51,10 +59,18 @@
     <section class="tab-content" id="tabTeachers">
       <div class="selector-card">
         <div class="selector-card__label">Виберіть викладача</div>
-        <div class="select-wrapper">
-          <select id="teacherSelect">
-            <option value="">— оберіть викладача —</option>
-          </select>
+        <div class="custom-select" id="teacherCustomSelect">
+          <div class="custom-select__header" id="teacherSelectHeader">
+            <span class="custom-select__value" id="teacherSelectValue">— оберіть викладача —</span>
+            <i class="fa-solid fa-chevron-down custom-select__icon"></i>
+          </div>
+          <div class="custom-select__dropdown" id="teacherSelectDropdown">
+            <div class="custom-select__search">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="teacherSearchInput" placeholder="Пошук викладача..." autocomplete="off">
+            </div>
+            <ul class="custom-select__list" id="teacherList"></ul>
+          </div>
         </div>
       </div>
       <h2 id="teacherTitle" style="text-align:center;margin-bottom:1rem;font-size:1.1rem;color:var(--accent-yellow)"></h2>
@@ -106,7 +122,7 @@
   </main>
 
   <footer class="footer">
-    <p><i class="fa-solid fa-clock-rotate-left"></i> Тимчасова сторінка розкладу СФК ДУ КАІ © 2026</p>
+    <p><i class="fa-solid fa-clock-rotate-left"></i> Тимчасова сторінка розкладу СФК КАІ © 2026</p>
     <p style="margin-top:0.3rem">Основний сайт тимчасово недоступний</p>
   </footer>
 

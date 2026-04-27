@@ -163,6 +163,8 @@ body::before {
 
 /* ─── Select / Dropdown ─── */
 .selector-card {
+  position: relative;
+  z-index: 10;
   background: var(--bg-card);
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-xl);
@@ -181,39 +183,119 @@ body::before {
   margin-bottom: 0.7rem;
 }
 
-.select-wrapper {
+/* ─── Custom Select / Dropdown ─── */
+.custom-select {
   position: relative;
+  width: 100%;
 }
 
-.select-wrapper select {
+.custom-select__header {
   width: 100%;
-  padding: 0.75rem 2.5rem 0.75rem 1rem;
+  padding: 0.75rem 1rem;
   background: var(--bg-secondary);
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-md);
   color: var(--text-primary);
-  font-family: inherit;
   font-size: 0.95rem;
   cursor: pointer;
-  appearance: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   transition: var(--transition);
 }
 
-.select-wrapper select:focus {
-  outline: none;
+.custom-select__header:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.custom-select.open .custom-select__header {
   border-color: var(--accent-blue);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
-.select-wrapper::after {
-  content: '▾';
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
+.custom-select__icon {
   color: var(--text-muted);
+  font-size: 0.9rem;
+  transition: transform 0.3s ease;
+}
+
+.custom-select.open .custom-select__icon {
+  transform: rotate(180deg);
+}
+
+.custom-select__dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  margin-top: 0.5rem;
+  z-index: 100;
+  max-height: 350px;
+  display: none;
+  flex-direction: column;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  backdrop-filter: blur(16px);
+}
+
+.custom-select.open .custom-select__dropdown {
+  display: flex;
+}
+
+.custom-select__search {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--border-glass);
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  color: var(--text-muted);
+}
+
+.custom-select__search input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  outline: none;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.custom-select__search input::placeholder {
+  color: var(--text-muted);
+}
+
+.custom-select__list {
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+}
+
+.custom-select__list li {
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  font-size: 0.95rem;
+  transition: background 0.2s ease;
+}
+
+.custom-select__list li:last-child {
+  border-bottom: none;
+}
+
+.custom-select__list li:hover {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.custom-select__list li.no-results {
+  color: var(--text-muted);
+  text-align: center;
   pointer-events: none;
-  font-size: 1rem;
+  padding: 1.5rem 1rem;
 }
 
 /* ─── Schedule Table ─── */
@@ -246,7 +328,12 @@ body::before {
 .schedule-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed; /* Fixes column alignment across different tables */
 }
+
+.col-pair { width: 65px; }
+.col-middle { width: 35%; }
+.col-last { width: auto; }
 
 .schedule-table th {
   text-align: left;
@@ -265,6 +352,7 @@ body::before {
   font-size: 0.88rem;
   border-bottom: 1px solid var(--border-glass);
   vertical-align: top;
+  word-wrap: break-word; /* Prevents long text from breaking layout */
 }
 
 .schedule-table tr:last-child td { border-bottom: none; }
@@ -386,14 +474,25 @@ body::before {
 }
 
 /* ─── Responsive ─── */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
+  .col-pair { width: 55px; }
+  .schedule-table th,
+  .schedule-table td { padding: 0.5rem 0.6rem; font-size: 0.82rem; }
+  .pair-number { width: 26px; height: 26px; font-size: 0.8rem; }
+}
+
+@media (max-width: 480px) {
   .container { padding: 0.5rem; }
   .header { padding: 1.5rem 0.5rem 1rem; }
   .tabs { flex-direction: column; gap: 0.3rem; }
   .tab-btn { justify-content: flex-start; padding: 0.6rem 1rem; }
 
+  .col-pair { width: 45px; }
+  .col-middle { width: 40%; }
+  
   .schedule-table th,
-  .schedule-table td { padding: 0.5rem 0.6rem; font-size: 0.8rem; }
+  .schedule-table td { padding: 0.5rem 0.4rem; font-size: 0.75rem; }
+  .pair-number { width: 24px; height: 24px; font-size: 0.75rem; border-radius: 6px; }
 
   .day-card__header { font-size: 0.85rem; padding: 0.7rem 0.9rem; }
   .docs-grid { grid-template-columns: 1fr; }
