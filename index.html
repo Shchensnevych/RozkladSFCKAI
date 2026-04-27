@@ -3,19 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Тимчасовий розклад занять СФК ДУ КАІ — перегляд за викладачами та групами">
+  <meta name="description" content="Тимчасовий розклад занять СФК КАІ — перегляд за викладачами та групами">
   <meta name="theme-color" content="#0f1117">
-  <title>Розклад занять — СФК ДУ КАІ</title>
+  <title>Розклад занять — СФК КАІ</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <header class="header">
-    <div class="header__badge"><i class="fa-solid fa-triangle-exclamation"></i> Тимчасова сторінка</div>
+    <div class="header__badge"><i class="fa-solid fa-bolt-lightning" style="color: #fbbf24;"></i> Пункт незламності</div>
     <h1 class="header__title">Розклад занять</h1>
     <p class="header__subtitle">Слов'янський фаховий коледж державного некомерційного підприємства «Державний університет «Київський авіаційний інститут»</p>
-    <p class="header__date-range" id="dateRange"></p>
+    
+    <div class="info-block">
+      <div class="info-block__icon"><i class="fa-solid fa-circle-info"></i></div>
+      <div class="info-block__content">
+        <p class="info-block__title">Як користуватись розкладом:</p>
+        <ul class="info-block__list">
+          <li><strong>Вибір тижня:</strong> оберіть будь-яку дату в календарі нижче, щоб відкрити розклад на відповідний тиждень.</li>
+          <li><strong>Журнал викладача:</strong> розгорніть блок «Всього проведено» над таблицею розкладу та клікніть на дисципліну, щоб побачити точні дати та номери пар за весь семестр.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="week-selector-container" style="display: flex; justify-content: center; position: relative; z-index: 50;">
+      <div class="date-picker-wrapper" id="datePickerWrapper" style="position: relative; max-width: 320px; width: 100%; cursor: pointer;">
+        <div class="custom-select__header" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 2rem; padding: 0.6rem 1.2rem; display: flex; justify-content: center; align-items: center; transition: background 0.2s;">
+          <i class="fa-regular fa-calendar-days" style="color: var(--accent-blue-light);"></i>
+          <span class="custom-select__value" id="weekSelectValue" style="font-weight: 500; font-size: 0.95rem; margin: 0 0.5rem;">— оберіть дату —</span>
+          <i class="fa-solid fa-chevron-down custom-select__icon"></i>
+        </div>
+      </div>
+    </div>
   </header>
 
   <main class="container">
@@ -51,7 +73,8 @@
           </div>
         </div>
       </div>
-      <h2 id="groupTitle" style="text-align:center;margin-bottom:1rem;font-size:1.1rem;color:var(--accent-blue-light)"></h2>
+      <h2 id="groupTitle" style="text-align:center;margin-bottom:0.5rem;font-size:1.1rem;color:var(--accent-blue-light)"></h2>
+      <div id="groupStats" class="stats-container"></div>
       <div class="schedule-output" id="groupOutput"></div>
     </section>
 
@@ -73,7 +96,8 @@
           </div>
         </div>
       </div>
-      <h2 id="teacherTitle" style="text-align:center;margin-bottom:1rem;font-size:1.1rem;color:var(--accent-yellow)"></h2>
+      <h2 id="teacherTitle" style="text-align:center;margin-bottom:0.5rem;font-size:1.1rem;color:var(--accent-yellow)"></h2>
+      <div id="teacherStats" class="stats-container"></div>
       <div class="schedule-output" id="teacherOutput"></div>
     </section>
 
@@ -108,15 +132,21 @@
           <a href="pdf/kursovi_estzp.pdf" target="_blank" class="doc-card">
             <span class="doc-card__icon"><i class="fa-solid fa-clipboard-list"></i></span>
             <div class="doc-card__info">
-              <div class="doc-card__title">Графік захисту курсових — ЦК ЕСТЗП</div>
+              <div class="doc-card__title">Графік захисту курсових робіт цк ЕСТЗП</div>
+              <div class="doc-card__desc">PDF документ</div>
+            </div>
+            <span class="doc-card__arrow">→</span>
+          </a>
+          <a href="pdf/kursovi_kit.pdf" target="_blank" class="doc-card">
+            <span class="doc-card__icon"><i class="fa-solid fa-clipboard-list" style="color: var(--accent-blue-light)"></i></span>
+            <div class="doc-card__info">
+              <div class="doc-card__title">Графік захисту курсових проєктів цк Автоматизація та КІТ</div>
               <div class="doc-card__desc">PDF документ</div>
             </div>
             <span class="doc-card__arrow">→</span>
           </a>
         </div>
       </div>
-
-
     </section>
 
   </main>
@@ -126,6 +156,19 @@
     <p style="margin-top:0.3rem">Основний сайт тимчасово недоступний</p>
   </footer>
 
+  <!-- Journal Modal -->
+  <div id="journalModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="journalModalTitle">Деталі дисципліни</h3>
+        <button id="journalModalClose" class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" id="journalModalBody"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://npmcdn.com/flatpickr/dist/l10n/uk.js"></script>
   <script src="data.js"></script>
   <script src="app.js"></script>
 </body>
