@@ -80,26 +80,37 @@ function buildTeacherSchedule(data, tids) {
 
   byDate.forEach((records, dt) => {
     const merged = [];
-    const visited = new Set();
+    const pairMap = new Map();
 
-    records.forEach((rec, idx) => {
-      if (visited.has(idx)) return;
-      visited.add(idx);
+    records.forEach(rec => {
+      if (!pairMap.has(rec.pair)) {
+        pairMap.set(rec.pair, []);
+      }
+      pairMap.get(rec.pair).push(rec);
+    });
 
-      const groups = [rec.gname];
-      // Find other records with same date, pair, lesson
-      records.forEach((other, oidx) => {
-        if (oidx !== idx && !visited.has(oidx) &&
-            other.pair === rec.pair && other.lesson === rec.lesson) {
-          groups.push(other.gname);
-          visited.add(oidx);
-        }
+    pairMap.forEach((items, pairNum) => {
+      // Group by lesson within the same pair
+      const lessonMap = new Map();
+      items.forEach(item => {
+        if (!lessonMap.has(item.lesson)) lessonMap.set(item.lesson, []);
+        lessonMap.get(item.lesson).push(item.gname);
       });
 
+      const groupStrs = [];
+      const lessonStrs = [];
+      
+      lessonMap.forEach((groups, lesson) => {
+        groupStrs.push(groups.join(', '));
+        lessonStrs.push(lesson);
+      });
+
+      const separator = '<div style="height:1px; background:var(--border-glass); margin: 6px 0;"></div>';
+      
       merged.push({
-        pair: rec.pair,
-        groups: groups.join(', '),
-        lesson: rec.lesson
+        pair: pairNum,
+        groups: groupStrs.join(separator),
+        lesson: lessonStrs.join(separator)
       });
     });
 
@@ -110,18 +121,37 @@ function buildTeacherSchedule(data, tids) {
   return result;
 }
 
-// ─── Group schedule ───
+// ─── Group schedule (merge half-pairs) ───
 function buildGroupSchedule(data, gid) {
   const filtered = data.filter(r => r.gid === gid);
   const byDate = groupByDate(filtered);
   const result = new Map();
 
   byDate.forEach((records, dt) => {
-    result.set(dt, records.map(r => ({
-      pair: r.pair,
-      fam: r.fam,
-      lesson: r.lesson
-    })));
+    const merged = [];
+    const pairMap = new Map();
+
+    records.forEach(rec => {
+      if (!pairMap.has(rec.pair)) {
+        pairMap.set(rec.pair, []);
+      }
+      pairMap.get(rec.pair).push(rec);
+    });
+
+    pairMap.forEach((items, pairNum) => {
+      const famStrs = items.map(item => item.fam);
+      const lessonStrs = items.map(item => item.lesson);
+      const separator = '<div style="height:1px; background:var(--border-glass); margin: 6px 0;"></div>';
+
+      merged.push({
+        pair: pairNum,
+        fam: famStrs.join(separator),
+        lesson: lessonStrs.join(separator)
+      });
+    });
+
+    merged.sort((a, b) => a.pair - b.pair);
+    result.set(dt, merged);
   });
 
   return result;
